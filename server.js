@@ -2,17 +2,54 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
+import dotenv from "dotenv";
 
-const CLIENT_SECRET = "fa65447f527bfd023d5ffc0c553734a682b02033";
+dotenv.config();
+let secrets = [];
+for (let i = 0; i < 10; i++) {
+  const s = process.env['SECRET' + i];
+  if (s) {
+    const sps = s.split('/');
+    sps.forEach(sp => {
+      // console.log('sp: ', sp);
+      if (sp.includes(':')) {
+        let [key, val] = sp.split(':');
+        key = key.trim();
+        val = val.trim();
+        // console.log('val: ', val);
+        // console.log('key: ', key);
+        if(key && val) {
+          const prev = secrets.find(s => s.key === key)
+          if(!prev)
+            secrets.push({key, val});
+          else
+            prev.val = val;
+        }
+      }
+    });
+  }
+}
+// secrets.forEach(el => {
+//   console.log('secrets.el: ', el);
+// });
 
 const configJson = [
   {
     user: '001pv',
-    secret: "fa65447f527bfd023d5ffc0c553734a682b02033",
+    secret: "",
     getAccessUrl: 'https://github.com/login/oauth/access_token',
     getUserUrl: 'https://api.github.com/user',
   }
-]
+];
+configJson.forEach(el => {
+  el.secret = secrets.find(s => s.key === el.user).val;
+})
+// console.log('configJson: ', configJson);
+
+
+// // process.env.USER_ID
+// console.log('process.env: ', process.env);
+// console.log('process.env.USER_ID: ', process.env.USER_ID);
 
 const app = express();
 app.use(cors());
@@ -25,7 +62,7 @@ app.get('/getAccess', async (req, res) => {
   const user = req.query.user;
   const usr = configJson.find(u => u.user === user);
   if (!usr) {
-    res.json({ error: 'user not found' });
+    res.json({error: 'user not found'});
     return;
   }
   const url = usr.getAccessUrl;
@@ -66,7 +103,7 @@ app.get('/getUser', async (req, res) => {
   const user = req.query.user;
   const usr = configJson.find(u => u.user === user);
   if (!usr) {
-    res.json({ error: 'user not found' });
+    res.json({error: 'user not found'});
     return;
   }
   const url = usr.getUserUrl;
