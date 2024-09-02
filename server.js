@@ -1,10 +1,14 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import fetch from "node-fetch";
+// const express = require("express");
+// const cors = require("cors");
 
-// https://www.npmjs.com/package/node-fetch
-const fetch = (...args) => import('node-fetch')
-  .then(({default: fetch}) => fetch(...args));
-const bodyParser = require("body-parser");
+// // https://www.npmjs.com/package/node-fetch
+// const fetch = (...args) => import('node-fetch')
+//   .then(({default: fetch}) => fetch(...args));
+// const bodyParser = require("body-parser");
 
 const CLIENT_ID = "Ov23ctVnUkimxLxTvxSy";
 const CLIENT_SECRET = "fa65447f527bfd023d5ffc0c553734a682b02033";
